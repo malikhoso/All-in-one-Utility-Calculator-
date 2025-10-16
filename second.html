@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en" class=""> <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All-in-One Utilities</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        'primary': '#4f46e5', 'primary-hover': '#4338ca', 'secondary': '#10b981',
+                        'light-bg': '#f3f4f6', 'light-card': '#ffffff', 'light-text': '#1f2937', 'light-subtle': '#6b7280',
+                        'dark-bg': '#111827', 'dark-card': '#1f2937', 'dark-text': '#f9fafb', 'dark-subtle': '#9ca3af',
+                        'dark-primary': '#818cf8', 'dark-primary-hover': '#6366f1',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body, .transition-colors {
+            transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out, border-color 0.3s ease-in-out;
+        }
+        .file-input-label, .main-nav-button { transition: all 0.2s ease-in-out; }
+        .main-nav-button.active { color: #4f46e5; border-bottom: 2px solid #4f46e5; }
+        .dark .main-nav-button.active { color: #818cf8; border-bottom-color: #818cf8; }
+        .mode-button.active { background-color: #4f46e5; color: white; box-shadow: 0 4px 14px 0 rgba(79, 70, 229, 0.39); }
+        .dark .mode-button.active { background-color: #818cf8; color: #1f2937; box-shadow: 0 4px 14px 0 rgba(129, 140, 248, 0.25); }
+    </style>
+</head>
+
+<body class="bg-light-bg dark:bg-dark-bg font-sans transition-colors duration-300">
+
+    <div class="min-h-screen w-full flex items-center justify-center p-4 bg-gradient-to-br from-indigo-50 via-white to-cyan-50 dark:from-gray-900 dark:via-gray-900 dark:to-indigo-900/20">
+        <div id="app-container" class="w-full max-w-2xl bg-light-card dark:bg-dark-card shadow-2xl rounded-2xl p-6 sm:p-10 border border-gray-200 dark:border-gray-700 transition-colors relative">
+            
+            <button id="theme-toggle" class="absolute top-4 right-4 p-2 rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary dark:focus:ring-offset-dark-card dark:focus:ring-dark-primary">
+                <svg id="theme-toggle-dark-icon" class="h-6 w-6 hidden" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+                <svg id="theme-toggle-light-icon" class="h-6 w-6 hidden" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.707.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm-.707 10.607a1 1 0 011.414 0l.707-.707a1 1 0 111.414 1.414l-.707.707a1 1 0 01-1.414 0zM1 11a1 1 0 100-2H0a1 1 0 100 2h1z"></path></svg>
+            </button>
+            
+            <h1 class="text-4xl font-extrabold text-center text-light-text dark:text-dark-text mb-2 transition-colors">All-in-One Utilities</h1>
+            <p class="text-center text-light-subtle dark:text-dark-subtle mb-6 transition-colors">Your daily hub for quick calculations and conversions.</p>
+
+            <nav class="flex justify-center border-b border-gray-200 dark:border-gray-700 mb-8">
+                <button class="main-nav-button font-semibold py-4 px-6 text-light-subtle dark:text-dark-subtle" onclick="showTool('converter-tool')">Converter</button>
+                <button class="main-nav-button font-semibold py-4 px-6 text-light-subtle dark:text-dark-subtle" onclick="showTool('bmi-tool')">BMI Calculator</button>
+                <button class="main-nav-button font-semibold py-4 px-6 text-light-subtle dark:text-dark-subtle" onclick="showTool('gpa-tool')">GPA Calculator</button>
+            </nav>
+
+            <div id="converter-tool" class="tool-content">
+                <div class="flex justify-center mb-8 bg-gray-100 dark:bg-gray-700/50 p-1 rounded-xl shadow-inner transition-colors">
+                    <button id="mode-img-img" class="mode-button w-1/3 px-4 py-2 text-sm sm:text-base font-semibold text-gray-700 dark:text-gray-300 rounded-lg" onclick="setMode('IMG_TO_IMG')">Image ↔ Image</button>
+                    <button id="mode-img-pdf" class="mode-button w-1/3 px-4 py-2 text-sm sm:text-base font-semibold text-gray-700 dark:text-gray-300 rounded-lg" onclick="setMode('IMG_TO_PDF')">Image → PDF</button>
+                    <button id="mode-pdf-img" class="mode-button w-1/3 px-4 py-2 text-sm sm:text-base font-semibold text-gray-700 dark:text-gray-300 rounded-lg" onclick="setMode('PDF_TO_IMG')">PDF → Image</button>
+                </div>
+                <canvas id="conversionCanvas" class="hidden"></canvas>
+                <div class="mb-6">
+                    <input type="file" id="fileInput" class="hidden" onchange="handleFileChange(this)">
+                    <label for="fileInput" id="dropArea" class="file-input-label flex flex-col items-center justify-center p-8 rounded-xl text-light-subtle dark:text-dark-subtle border-2 border-dashed border-indigo-300 dark:border-gray-600 hover:border-primary dark:hover:border-dark-primary hover:bg-indigo-50 dark:hover:bg-gray-700/50">
+                        <svg class="w-10 h-10 text-primary dark:text-dark-primary mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 014 4v2a4 4 0 01-4 4H7z"></path></svg>
+                        <span id="labelTitle" class="text-lg font-semibold text-light-text dark:text-dark-text transition-colors">Click to select file</span>
+                        <span id="labelSubtitle" class="text-sm">Formats: JPG, PNG | Drag and drop here</span>
+                    </label>
+                </div>
+                <div id="statusArea" class="text-center mb-6 min-h-[3rem]">
+                    <p id="statusMessage" class="text-light-subtle dark:text-dark-subtle font-medium transition-colors">Ready. Select a file to begin.</p>
+                </div>
+                <div id="outputArea" class="hidden flex flex-col items-center gap-4 border-t border-gray-200 dark:border-gray-700 pt-6 transition-colors">
+                    <h2 class="text-xl font-semibold text-light-text dark:text-dark-text transition-colors">Conversion Complete</h2>
+                    <div id="previewContainer" class="flex justify-center w-full">
+                        <img id="imagePreview" src="" alt="Converted Preview" class="max-h-64 max-w-full rounded-lg shadow-md border border-gray-200 dark:border-gray-600 object-contain hidden" onerror="this.classList.add('hidden');">
+                        <p id="pdfSuccessMessage" class="text-lg text-green-600 dark:text-green-400 font-medium hidden">Your PDF file is ready to download.</p>
+                    </div>
+                    <a id="downloadLink" href="#" download="converted_file" class="download-button w-full max-w-xs text-center py-3 rounded-lg bg-primary dark:bg-dark-primary text-white dark:text-dark-card font-bold text-lg shadow-lg shadow-indigo-500/50 dark:shadow-indigo-500/30 hover:bg-primary-hover dark:hover:bg-dark-primary-hover disabled:opacity-50 mt-4 transition-all duration-200 transform hover:scale-105">Download File</a>
+                    <button onclick="resetApp()" class="text-sm text-light-subtle dark:text-dark-subtle hover:text-primary dark:hover:text-dark-primary mt-2 transition-colors">Start New Conversion</button>
+                </div>
+            </div>
+
+            <div id="bmi-tool" class="tool-content hidden">
+                 <div class="space-y-6">
+                    <div class="flex flex-wrap justify-center gap-x-4 gap-y-2">
+                        <label class="flex items-center space-x-2 text-light-text dark:text-dark-text">
+                            <input type="radio" name="bmiUnit" value="metric" checked class="form-radio text-primary dark:text-dark-primary focus:ring-primary dark:focus:ring-dark-primary">
+                            <span>Metric (kg, cm)</span>
+                        </label>
+                        <label class="flex items-center space-x-2 text-light-text dark:text-dark-text">
+                            <input type="radio" name="bmiUnit" value="imperial" class="form-radio text-primary dark:text-dark-primary focus:ring-primary dark:focus:ring-dark-primary">
+                            <span>Imperial (lb, ft, in)</span>
+                        </label>
+                        <label class="flex items-center space-x-2 text-light-text dark:text-dark-text">
+                            <input type="radio" name="bmiUnit" value="mixed" class="form-radio text-primary dark:text-dark-primary focus:ring-primary dark:focus:ring-dark-primary">
+                            <span>Mixed (kg, ft, in)</span>
+                        </label>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label for="weight" id="weight-label" class="block text-sm font-medium text-light-subtle dark:text-dark-subtle">Weight (kg)</label>
+                            <input type="number" id="weight" placeholder="e.g., 70" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary focus:ring-primary dark:focus:border-dark-primary dark:focus:ring-dark-primary">
+                        </div>
+                        <div>
+                            <label for="height-cm" id="height-label" class="block text-sm font-medium text-light-subtle dark:text-dark-subtle">Height (cm)</label>
+                            <div id="metric-height-group">
+                                <input type="number" id="height-cm" placeholder="e.g., 175" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary focus:ring-primary dark:focus:border-dark-primary dark:focus:ring-dark-primary">
+                            </div>
+                            <div id="imperial-height-group" class="hidden mt-1 grid grid-cols-2 gap-2">
+                                <input type="number" id="height-ft" placeholder="ft" class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary focus:ring-primary dark:focus:border-dark-primary dark:focus:ring-dark-primary">
+                                <input type="number" id="height-in" placeholder="in" class="block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary focus:ring-primary dark:focus:border-dark-primary dark:focus:ring-dark-primary">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button onclick="calculateBMI()" class="w-full text-center py-3 rounded-lg bg-primary dark:bg-dark-primary text-white dark:text-dark-card font-bold text-lg shadow-lg shadow-indigo-500/50 dark:shadow-indigo-500/30 hover:bg-primary-hover dark:hover:bg-dark-primary-hover transition-all duration-200 transform hover:scale-105">
+                        Calculate BMI
+                    </button>
+
+                    <div id="bmiResultArea" class="text-center p-6 bg-gray-50 dark:bg-gray-700/50 rounded-lg hidden">
+                        <p class="text-lg text-light-subtle dark:text-dark-subtle">Your BMI is</p>
+                        <p id="bmiValue" class="text-5xl font-extrabold text-light-text dark:text-dark-text my-2">0.0</p>
+                        <p id="bmiCategory" class="text-xl font-semibold">Category</p>
+                    </div>
+
+                    <div class="pt-4">
+                        <h3 class="text-lg font-semibold text-center text-light-text dark:text-dark-text mb-3">BMI Categories</h3>
+                        <table class="w-full text-sm text-left text-light-subtle dark:text-dark-subtle">
+                            <thead class="text-xs text-light-text dark:text-dark-text uppercase bg-gray-50 dark:bg-gray-700/50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 rounded-l-lg">Category</th>
+                                    <th scope="col" class="px-6 py-3 rounded-r-lg">BMI Range</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="bg-white dark:bg-dark-card border-b dark:border-gray-700">
+                                    <td class="px-6 py-3 font-medium text-blue-600 dark:text-blue-400">Underweight</td>
+                                    <td class="px-6 py-3">&lt; 18.5</td>
+                                </tr>
+                                <tr class="bg-white dark:bg-dark-card border-b dark:border-gray-700">
+                                    <td class="px-6 py-3 font-medium text-green-600 dark:text-green-400">Normal weight</td>
+                                    <td class="px-6 py-3">18.5 – 24.9</td>
+                                </tr>
+                                <tr class="bg-white dark:bg-dark-card border-b dark:border-gray-700">
+                                    <td class="px-6 py-3 font-medium text-yellow-500 dark:text-yellow-400">Overweight</td>
+                                    <td class="px-6 py-3">25 – 29.9</td>
+                                </tr>
+                                <tr class="bg-white dark:bg-dark-card">
+                                    <td class="px-6 py-3 font-medium text-red-600 dark:text-red-400">Obesity</td>
+                                    <td class="px-6 py-3">≥ 30</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="gpa-tool" class="tool-content hidden">
+                <div class="space-y-4">
+                    <div id="gpa-subjects-container" class="space-y-3">
+                        </div>
+                    
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <button onclick="addSubjectRow()" class="w-full sm:w-1/2 py-2 px-4 border border-dashed border-primary dark:border-dark-primary text-primary dark:text-dark-primary font-semibold rounded-lg hover:bg-indigo-50 dark:hover:bg-gray-700/50">
+                            + Add Subject
+                        </button>
+                        <button onclick="calculateGPA()" class="w-full sm:w-1/2 py-2 px-4 bg-primary dark:bg-dark-primary text-white dark:text-dark-card font-bold rounded-lg shadow-md hover:bg-primary-hover dark:hover:bg-dark-primary-hover transition-all">
+                            Calculate GPA
+                        </button>
+                    </div>
+
+                    <div id="gpaResultArea" class="text-center p-6 bg-gray-50 dark:bg-gray-700/50 rounded-lg hidden">
+                        <p class="text-lg text-light-subtle dark:text-dark-subtle">Your GPA is</p>
+                        <p id="gpaValue" class="text-5xl font-extrabold text-light-text dark:text-dark-text my-2">0.00</p>
+                        <p id="gpaTotalCredits" class="text-md text-light-subtle dark:text-dark-subtle">Total Credits: 0</p>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+    <script>
+        // ==================================================
+        // ===== CORE APP LOGIC (THEME & NAVIGATION) ======
+        // ==================================================
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const darkIcon = document.getElementById('theme-toggle-dark-icon');
+        const lightIcon = document.getElementById('theme-toggle-light-icon');
+        const htmlEl = document.documentElement;
+
+        const toggleTheme = () => {
+            htmlEl.classList.toggle('dark');
+            const isDarkMode = htmlEl.classList.contains('dark');
+            localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+            updateIcons(isDarkMode);
+        };
+
+        const updateIcons = (isDarkMode) => {
+            darkIcon.classList.toggle('hidden', !isDarkMode);
+            lightIcon.classList.toggle('hidden', isDarkMode);
+        };
+        
+        themeToggleBtn.addEventListener('click', toggleTheme);
+
+        const toolContents = document.querySelectorAll('.tool-content');
+        const navButtons = document.querySelectorAll('.main-nav-button');
+
+        function showTool(toolId) {
+            toolContents.forEach(tool => tool.classList.add('hidden'));
+            document.getElementById(toolId).classList.remove('hidden');
+
+            navButtons.forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.getAttribute('onclick').includes(toolId)) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+
+        // ==================================================
+        // ============= BMI CALCULATOR LOGIC =============
+        // ==================================================
+        const bmiUnitRadios = document.querySelectorAll('input[name="bmiUnit"]');
+        const weightLabel = document.getElementById('weight-label');
+        const heightLabel = document.getElementById('height-label');
+        const metricHeightGroup = document.getElementById('metric-height-group');
+        const imperialHeightGroup = document.getElementById('imperial-height-group');
+
+        function updateBmiInputs() {
+            const selectedUnit = document.querySelector('input[name="bmiUnit"]:checked').value;
+            if (selectedUnit === 'metric') {
+                weightLabel.textContent = 'Weight (kg)';
+                heightLabel.textContent = 'Height (cm)';
+                metricHeightGroup.classList.remove('hidden');
+                imperialHeightGroup.classList.add('hidden');
+            } else if (selectedUnit === 'imperial') {
+                weightLabel.textContent = 'Weight (lb)';
+                heightLabel.textContent = 'Height (ft, in)';
+                metricHeightGroup.classList.add('hidden');
+                imperialHeightGroup.classList.remove('hidden');
+            } else { // Mixed
+                weightLabel.textContent = 'Weight (kg)';
+                heightLabel.textContent = 'Height (ft, in)';
+                metricHeightGroup.classList.add('hidden');
+                imperialHeightGroup.classList.remove('hidden');
+            }
+        }
+
+        bmiUnitRadios.forEach(radio => radio.addEventListener('change', updateBmiInputs));
+
+        function calculateBMI() {
+            const weight = parseFloat(document.getElementById('weight').value);
+            const unit = document.querySelector('input[name="bmiUnit"]:checked').value;
+            const resultArea = document.getElementById('bmiResultArea');
+            const bmiValueEl = document.getElementById('bmiValue');
+            const bmiCategoryEl = document.getElementById('bmiCategory');
+            let height; // This will be cm for metric, total inches for imperial/mixed
+
+            if (unit === 'metric') {
+                height = parseFloat(document.getElementById('height-cm').value);
+            } else { // Imperial or Mixed
+                const feet = parseFloat(document.getElementById('height-ft').value) || 0;
+                const inches = parseFloat(document.getElementById('height-in').value) || 0;
+                height = (feet * 12) + inches; // Total height in inches
+            }
+
+            if (isNaN(weight) || isNaN(height) || weight <= 0 || height <= 0) {
+                alert('Please enter valid, positive numbers for weight and height.');
+                return;
+            }
+
+            let bmi = 0;
+            if (unit === 'metric') {
+                bmi = weight / ((height / 100) ** 2);
+            } else if (unit === 'imperial') {
+                bmi = 703 * (weight / (height ** 2));
+            } else { // Mixed unit calculation
+                const heightInMeters = height * 0.0254; // Convert total inches to meters
+                bmi = weight / (heightInMeters ** 2);
+            }
+
+            bmiValueEl.textContent = bmi.toFixed(1);
+            let category = '', colorClass = '';
+
+            if (bmi < 18.5) { category = 'Underweight'; colorClass = 'text-blue-500'; } 
+            else if (bmi < 25) { category = 'Normal weight'; colorClass = 'text-green-500'; } 
+            else if (bmi < 30) { category = 'Overweight'; colorClass = 'text-yellow-500'; } 
+            else { category = 'Obesity'; colorClass = 'text-red-500'; }
+            
+            bmiCategoryEl.textContent = category;
+            bmiCategoryEl.className = `text-xl font-semibold ${colorClass}`;
+            resultArea.classList.remove('hidden');
+        }
+
+        // ==================================================
+        // ============= GPA CALCULATOR LOGIC =============
+        // ==================================================
+        let subjectCount = 0;
+
+        function addSubjectRow() {
+            subjectCount++;
+            const container = document.getElementById('gpa-subjects-container');
+            const newRow = document.createElement('div');
+            newRow.id = `subject-row-${subjectCount}`;
+            newRow.className = 'grid grid-cols-12 gap-2 items-center';
+            newRow.innerHTML = `
+                <input type="text" placeholder="Subject ${subjectCount}" class="col-span-5 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary focus:ring-primary dark:focus:border-dark-primary dark:focus:ring-dark-primary">
+                <input type="number" placeholder="Credits" class="gpa-credits col-span-3 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary focus:ring-primary dark:focus:border-dark-primary dark:focus:ring-dark-primary">
+                <select class="gpa-grade col-span-3 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-primary focus:ring-primary dark:focus:border-dark-primary dark:focus:ring-dark-primary">
+                    <option value="4.0">A</option> <option value="3.7">A-</option> <option value="3.3">B+</option>
+                    <option value="3.0">B</option> <option value="2.7">B-</option> <option value="2.3">C+</option>
+                    <option value="2.0">C</option> <option value="1.7">C-</option> <option value="1.3">D+</option>
+                    <option value="1.0">D</option> <option value="0.0">F</option>
+                </select>
+                <button onclick="this.parentElement.remove()" class="col-span-1 text-red-500 hover:text-red-700 dark:hover:text-red-400">&times;</button>
+            `;
+            container.appendChild(newRow);
+        }
+
+        function calculateGPA() {
+            const creditInputs = document.querySelectorAll('.gpa-credits');
+            const gradeSelects = document.querySelectorAll('.gpa-grade');
+            const resultArea = document.getElementById('gpaResultArea');
+            const gpaValueEl = document.getElementById('gpaValue');
+            const gpaCreditsEl = document.getElementById('gpaTotalCredits');
+
+            let totalQualityPoints = 0;
+            let totalCredits = 0;
+
+            for (let i = 0; i < creditInputs.length; i++) {
+                const credits = parseFloat(creditInputs[i].value);
+                const gradePoint = parseFloat(gradeSelects[i].value);
+
+                if (!isNaN(credits) && credits > 0) {
+                    totalQualityPoints += credits * gradePoint;
+                    totalCredits += credits;
+                }
+            }
+
+            const gpa = totalCredits > 0 ? (totalQualityPoints / totalCredits) : 0;
+            
+            gpaValueEl.textContent = gpa.toFixed(2);
+            gpaCreditsEl.textContent = `Total Credits: ${totalCredits}`;
+            resultArea.classList.remove('hidden');
+        }
+
+        // ==================================================
+        // ========== FILE CONVERTER LOGIC (Existing) =========
+        // ==================================================
+        const MODE = { IMG_TO_IMG: 'IMG_TO_IMG', IMG_TO_PDF: 'IMG_TO_PDF', PDF_TO_IMG: 'PDF_TO_IMG' };
+        let currentMode = MODE.IMG_TO_IMG;
+        const fileInput = document.getElementById('fileInput');
+        const statusMessage = document.getElementById('statusMessage');
+        const conversionCanvas = document.getElementById('conversionCanvas');
+        const outputArea = document.getElementById('outputArea');
+        const downloadLink = document.getElementById('downloadLink');
+        const imagePreview = document.getElementById('imagePreview');
+        const fileInputLabel = document.getElementById('dropArea');
+        const labelTitle = document.getElementById('labelTitle');
+        const labelSubtitle = document.getElementById('labelSubtitle');
+        const pdfSuccessMessage = document.getElementById('pdfSuccessMessage');
+        const modeButtons = {
+            [MODE.IMG_TO_IMG]: document.getElementById('mode-img-img'),
+            [MODE.IMG_TO_PDF]: document.getElementById('mode-img-pdf'),
+            [MODE.PDF_TO_IMG]: document.getElementById('mode-pdf-img'),
+        };
+        const ctx = conversionCanvas.getContext('2d');
+        if (typeof pdfjsLib !== 'undefined') {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+        }
+        function setMode(mode) {
+            currentMode = mode;
+            Object.values(modeButtons).forEach(btn => btn.classList.remove('active'));
+            modeButtons[mode].classList.add('active');
+            if (mode === MODE.IMG_TO_IMG) {
+                fileInput.accept = 'image/jpeg, .jpg, .jpeg, image/png, .png';
+                labelTitle.textContent = 'Click to select JPG or PNG';
+                labelSubtitle.textContent = 'Output: The other image format';
+            } else if (mode === MODE.IMG_TO_PDF) {
+                fileInput.accept = 'image/jpeg, .jpg, .jpeg, image/png, .png';
+                labelTitle.textContent = 'Click to select an Image';
+                labelSubtitle.textContent = 'Output: PDF document';
+            } else if (mode === MODE.PDF_TO_IMG) {
+                fileInput.accept = 'application/pdf, .pdf';
+                labelTitle.textContent = 'Click to select a PDF';
+                labelSubtitle.textContent = 'Output: PNG Image';
+            }
+            resetApp();
+        }
+        function resetApp() {
+            fileInput.value = '';
+            statusMessage.textContent = `Ready. Select a file to begin.`;
+            outputArea.classList.add('hidden');
+            imagePreview.classList.add('hidden');
+            pdfSuccessMessage.classList.add('hidden');
+            downloadLink.removeAttribute('href');
+            fileInputLabel.classList.remove('hidden');
+        }
+        function handleFileChange(input) {
+            const file = input.files[0];
+            if (!file) { resetApp(); return; }
+            fileInputLabel.classList.add('hidden');
+            outputArea.classList.add('hidden');
+            statusMessage.textContent = 'Loading and verifying file...';
+            if (currentMode === MODE.PDF_TO_IMG && file.type !== 'application/pdf') {
+                statusMessage.textContent = 'Error: Please select a PDF file for this mode.';
+                fileInputLabel.classList.remove('hidden'); return;
+            }
+            if ((currentMode === MODE.IMG_TO_IMG || currentMode === MODE.IMG_TO_PDF) && !file.type.startsWith('image/')) {
+                 statusMessage.textContent = 'Error: Please select a JPG or PNG image file.';
+                fileInputLabel.classList.remove('hidden'); return;
+            }
+            if (currentMode === MODE.PDF_TO_IMG) {
+                convertPdfToImage(file);
+            } else {
+                const reader = new FileReader();
+                reader.onload = (e) => processImageConversion(e.target.result, file.name, file.type);
+                reader.onerror = () => { statusMessage.textContent = 'Error reading file.'; fileInputLabel.classList.remove('hidden'); }
+                reader.readAsDataURL(file);
+            }
+        }
+        function processImageConversion(dataUrl, originalFileName, originalFileType) {
+            statusMessage.textContent = 'Processing image...';
+            if (currentMode === MODE.IMG_TO_PDF) {
+                convertImageToPdf(dataUrl, originalFileName);
+            } else if (currentMode === MODE.IMG_TO_IMG) {
+                const isJpgInput = originalFileType === 'image/jpeg' || originalFileName.toLowerCase().endsWith('.jpg');
+                const targetMimeType = isJpgInput ? 'image/png' : 'image/jpeg';
+                const targetExtension = isJpgInput ? '.png' : '.jpg';
+                const quality = isJpgInput ? 1.0 : 0.92;
+                const img = new Image();
+                img.onload = function() {
+                    try {
+                        conversionCanvas.width = img.width; conversionCanvas.height = img.height;
+                        ctx.drawImage(img, 0, 0);
+                        const convertedDataUrl = conversionCanvas.toDataURL(targetMimeType, quality);
+                        let newFileName = originalFileName.replace(/\.(jpg|jpeg|png)$/i, targetExtension);
+                        updateDownloadUI(convertedDataUrl, newFileName, true, targetExtension.substring(1).toUpperCase());
+                    } catch (error) { console.error("Conversion error:", error); statusMessage.textContent = 'An error occurred during image conversion.'; fileInputLabel.classList.remove('hidden'); }
+                };
+                img.onerror = function() { statusMessage.textContent = 'Error: Could not load the selected image.'; fileInputLabel.classList.remove('hidden'); };
+                img.src = dataUrl;
+            }
+        }
+        function convertImageToPdf(dataUrl, fileName) {
+            statusMessage.textContent = 'Creating PDF document...';
+            const { jsPDF } = window.jspdf;
+            const img = new Image();
+            img.onload = function() {
+                try {
+                    const orientation = img.width > img.height ? 'l' : 'p';
+                    const doc = new jsPDF({ orientation, unit: 'px', format: [img.width, img.height] });
+                    const imgType = dataUrl.startsWith('data:image/png') ? 'PNG' : 'JPEG';
+                    doc.addImage(dataUrl, imgType, 0, 0, img.width, img.height);
+                    const pdfBlob = doc.output('blob');
+                    const pdfUrl = URL.createObjectURL(pdfBlob);
+                    let newFileName = fileName.replace(/\.(png|jpg|jpeg)$/i, '.pdf');
+                    updateDownloadUI(pdfUrl, newFileName, false, 'PDF');
+                    pdfSuccessMessage.classList.remove('hidden');
+                } catch (e) { console.error("jsPDF Error:", e); statusMessage.textContent = 'Error creating PDF.'; fileInputLabel.classList.remove('hidden'); }
+            };
+            img.onerror = function() { statusMessage.textContent = 'Error: Could not load image for PDF creation.'; fileInputLabel.classList.remove('hidden'); };
+            img.src = dataUrl;
+        }
+        async function convertPdfToImage(file) {
+            statusMessage.textContent = 'Loading PDF file...';
+            const fileArrayBuffer = await file.arrayBuffer();
+            try {
+                const pdf = await pdfjsLib.getDocument({ data: fileArrayBuffer }).promise;
+                statusMessage.textContent = `Rendering page 1 of ${pdf.numPages}...`;
+                const page = await pdf.getPage(1);
+                const viewport = page.getViewport({ scale: 1.5 });
+                conversionCanvas.width = viewport.width; conversionCanvas.height = viewport.height;
+                const renderContext = { canvasContext: ctx, viewport };
+                await page.render(renderContext).promise;
+                const pngDataUrl = conversionCanvas.toDataURL('image/png');
+                let newFileName = file.name.replace(/\.pdf$/i, '_page1.png');
+                updateDownloadUI(pngDataUrl, newFileName, true, 'PNG');
+            } catch (error) { console.error("PDF.js Error:", error); statusMessage.textContent = 'Error rendering PDF.'; fileInputLabel.classList.remove('hidden'); }
+        }
+        function updateDownloadUI(dataUrl, fileName, showImagePreview, fileType = 'File') {
+            downloadLink.href = dataUrl;
+            downloadLink.download = fileName;
+            downloadLink.textContent = `Download ${fileType}`;
+            if (showImagePreview) {
+                imagePreview.src = dataUrl; imagePreview.classList.remove('hidden');
+            } else {
+                imagePreview.classList.add('hidden');
+            }
+            statusMessage.textContent = 'Conversion successful!';
+            outputArea.classList.remove('hidden');
+        }
+        const dropArea = document.getElementById('dropArea');
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, e => { e.preventDefault(); e.stopPropagation(); }, false);
+            document.body.addEventListener(eventName, e => { e.preventDefault(); e.stopPropagation(); }, false);
+        });
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropArea.addEventListener(eventName, () => dropArea.classList.add('bg-indigo-50', 'dark:bg-gray-700/50', 'border-primary', 'dark:border-dark-primary'), false);
+        });
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, () => dropArea.classList.remove('bg-indigo-50', 'dark:bg-gray-700/50', 'border-primary', 'dark:border-dark-primary'), false);
+        });
+        dropArea.addEventListener('drop', e => {
+            const files = e.dataTransfer.files;
+            if (files.length > 0) { fileInput.files = files; handleFileChange(fileInput); }
+        }, false);
+        
+        // ==================================================
+        // =============== INITIALIZE APP =================
+        // ==================================================
+        window.onload = () => {
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+                htmlEl.classList.add('dark');
+                updateIcons(true);
+            } else {
+                htmlEl.classList.remove('dark');
+                updateIcons(false);
+            }
+
+            showTool('converter-tool');
+            setMode(MODE.IMG_TO_IMG);
+            addSubjectRow(); // Add one initial row for GPA calculator
+            updateBmiInputs(); // Set initial BMI inputs based on default unit
+        };
+    </script>
+</body>
+</html>
